@@ -1,0 +1,1 @@
+module.exports = process.env.CUTTER_COV ? require('./lib-cov/cutter') : require('./lib/cutter');

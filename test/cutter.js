@@ -10,6 +10,10 @@ describe('Cutter', function() {
   before(function() {
     cutter = Cutter.create(1, getLength);
   });
+  
+  after(function() {
+    cutter.destroy();
+  });
 
   it('cutter buf ok', function() {
     var buf = new Buffer(10);
@@ -133,6 +137,10 @@ describe('test in head body buffers', function() {
       body.toString(null, 1, 1+TEST_SQL.length).should.equal(TEST_SQL);
     });
   });
+  
+  after(function() {
+    cutter.destroy();
+  });
 
   it('should single buffer ok', function() {
     cutter.emit('data', packet);
@@ -190,7 +198,11 @@ describe('error buf', function() {
     return buf[0];
   }
   var cutter = new Cutter(4, getLength);
-
+  
+  after(function() {
+    cutter.destroy();
+  });
+  
   it('should emit undefined ok', function() {
     var i = 0;
     var onData = function(data) {

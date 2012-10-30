@@ -1,4 +1,4 @@
-cutter
+cutter![travis-ci](https://secure.travis-ci.org/dead-horse/cutter.png)
 ======
 
 A cutter for head-body buffer.

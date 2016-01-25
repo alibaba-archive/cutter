@@ -4,12 +4,13 @@
   "version": "0.0.2",
   "repository": {
     "type": "git",
-    "url": "git@github.com:dead-horse/cutter.git"
+    "url": "git@github.com:node_modules/cutter.git"
   },
   "devDependencies": {
+    "coveralls": "~2.11.6",
+    "istanbul": "~0.4.2",
     "mocha": "*",
-    "should": "*",
-    "visionmedia-jscoverage": "*"
+    "should": "*"
   },
   "author": "dead_horse <dead_horse@qq.com> (http://deadhorse.me)",
   "main": "./index.js",
@@ -23,6 +24,9 @@
     "lib": "./lib"
   },
   "keywords": [
-    "socket", "net", "buffer", "packet"
+    "socket",
+    "net",
+    "buffer",
+    "packet"
   ]
 }

@@ -1,4 +1,4 @@
-cutter![travis-ci](https://secure.travis-ci.org/dead-horse/cutter.png)
+cutter![travis-ci](https://secure.travis-ci.org/node-modules/cutter.png)
 ======
 
 A cutter for head-body buffer.
@@ -24,7 +24,7 @@ var server = net.createServer(function(socket) {
     var body = packet.slice(4, packet.length);
   });
   socket.on('data', function(data) {
-    cutter.execute(data);
+    cutter.handleData(data);
   });
 });
 

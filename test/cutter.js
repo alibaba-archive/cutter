@@ -10,7 +10,7 @@ describe('Cutter', function() {
   before(function() {
     cutter = Cutter.create(1, getLength);
   });
-  
+
   after(function() {
     cutter.destroy();
   });
@@ -19,20 +19,19 @@ describe('Cutter', function() {
     var buf = new Buffer(10);
     buf[0] = 10;
     var times = 0;
-    cutter.on('packet', function(packet) {
+    cutter.on('packet', function (packet) {
       packet.length.should.equal(10);
       times++;
     });
     for (var i = 0; i < 10; ++i) {
-      cutter.emit('data', buf);
+      cutter.handleData(buf);
     }
     times.should.equal(10);
     cutter.removeAllListeners('packet');
   });
 
   it('cutter buf head body ok', function() {
-    var head = new Buffer(1);
-    head[0] = 10;
+    var head = new Buffer([10]);
     var body = new Buffer(9);
     var times = 0;
     cutter.on('packet', function(packet) {
@@ -40,8 +39,8 @@ describe('Cutter', function() {
       times++;
     });
     for (var i = 0; i < 10; ++i) {
-      cutter.emit('data', head);
-      cutter.emit('data', body);
+      cutter.handleData(head);
+      cutter.handleData(body);
     }
     times.should.equal(10);
     cutter.removeAllListeners('packet');
@@ -52,17 +51,16 @@ describe('Cutter', function() {
     head[0] = 10;
     var body = new Buffer(5);
     var times = 0;
-    cutter.on('packet', function(packet) {
+    cutter.on('packet', function (packet) {
       packet.length.should.equal(10);
       times++;
     });
     for (var i = 0; i < 10; ++i) {
-      cutter.emit('data', head);
-      cutter.emit('data', body);
+      cutter.handleData(head);
+      cutter.handleData(body);
     }
     times.should.equal(10);
     cutter.removeAllListeners('packet');
-
   });
 
   it('cutter buf content more complete ok', function() {
@@ -76,8 +74,8 @@ describe('Cutter', function() {
       times++;
     });
     for (var i = 0; i < 10; ++i) {
-      cutter.emit('data', head);
-      cutter.emit('data', body);
+      cutter.handleData(head);
+      cutter.handleData(body);
     }
     times.should.equal(30);
     cutter.removeAllListeners('packet');
@@ -92,7 +90,7 @@ describe('Cutter', function() {
       buf[0] = len1;
       buf[len1] = len2;
       bufs.push(buf);
-    } 
+    }
     var times = 0;
     cutter.on('packet', function(packet) {
       packet.length.should.below(205);
@@ -104,7 +102,7 @@ describe('Cutter', function() {
     for (var i = 0; i < 10000; i++) {
       (function(j) {
         process.nextTick(function() {
-          cutter.emit('data', bufs[j]);
+          cutter.handleData(bufs[j]);
         });
       })(i);
     }
@@ -116,7 +114,8 @@ describe('test in head body buffers', function() {
     return 4 + data[0] + (data[1] << 8) + (data[2] << 16);
   }
   var cutter = new Cutter(4, packetLength);
-  var packet = new Buffer(4+258);
+  var packet = new Buffer(4 + 258);
+
   before(function() {
     var COM_QUERY = 3;
     var TEST_SQL = "select * from t"
@@ -137,33 +136,33 @@ describe('test in head body buffers', function() {
       body.toString(null, 1, 1+TEST_SQL.length).should.equal(TEST_SQL);
     });
   });
-  
+
   after(function() {
     cutter.destroy();
   });
 
   it('should single buffer ok', function() {
-    cutter.emit('data', packet);
+    cutter.handleData(packet);
   });
 
   it('should single buffer ok', function() {
-    cutter.emit('data', packet.slice(0, 4));
-    cutter.emit('data', packet.slice(4));
+    cutter.handleData(packet.slice(0, 4));
+    cutter.handleData(packet.slice(4));
   });
 
   it('should pieces buffer ok', function () {
     var buff = null;
     buff = packet.slice(0, 2);
-    cutter.emit('data', buff);
+    cutter.handleData(buff);
 
     buff = packet.slice(2, 2+2);
-    cutter.emit('data', buff);
+    cutter.handleData(buff);
 
     buff = packet.slice(4, 4+1);
-    cutter.emit('data', buff);
+    cutter.handleData(buff);
 
     buff = packet.slice(5);
-    cutter.emit('data', buff);
+    cutter.handleData(buff);
   });
 
   it('test pieces random ok', function () {
@@ -186,9 +185,9 @@ describe('test in head body buffers', function() {
       var buff1 = two_packets.slice(0, slice_1);
       var buff2 = two_packets.slice(slice_1, slice_2);
       var buff3 = two_packets.slice(slice_2);
-      cutter.emit('data', buff1);
-      cutter.emit('data', buff2);
-      cutter.emit('data', buff3);
+      cutter.handleData(buff1);
+      cutter.handleData(buff2);
+      cutter.handleData(buff3);
     }
   });
 });
@@ -198,36 +197,22 @@ describe('error buf', function() {
     return buf[0];
   }
   var cutter = new Cutter(4, getLength);
-  
+
   after(function() {
     cutter.destroy();
   });
-  
-  it('should emit undefined ok', function() {
-    var i = 0;
-    var onData = function(data) {
-      should.not.exist(data);
-      i++;
-    }
-    cutter.on('data', onData);
-    for (var i = 0; i < 1000; i++) {
-      cutter.emit('data');
-    } 
-    i.should.equal(1000);
-    cutter.removeListener('data', onData);
-  });
 
-  it('should emit wrong length ok', function() {
-    var i = 0;
-    var onData = function() {
-      i++;
+  it('should emit error ok', function (done) {
+    var onPacket = function(packet) {
+      should.not.exist(packet);
     }
-    for (var i = 0; i < 1000; i++) {
-      var buf = new Buffer(10);
-      buf[0] = 1;
-      cutter.emit('data', buf);
-    }
-    i.should.equal(1000);
-    cutter.removeListener('data', onData);
+    cutter.on('packet', onPacket);
+    cutter.on('error', function (err) {
+      should.exist(err);
+      done();
+    });
+    cutter.handleData(new Buffer([4, 0, 0, 0]));
+    cutter.removeAllListeners('packet');
+    cutter.removeAllListeners('error');
   });
 });

@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git@github.com:node_modules/cutter.git"
   },
+  "files":[
+    "index.js"
+  ],
   "devDependencies": {
     "coveralls": "~2.11.6",
     "istanbul": "~0.4.2",

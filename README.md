@@ -1,10 +1,10 @@
-cutter![travis-ci](https://secure.travis-ci.org/dead-horse/cutter.png)
+cutter![travis-ci](https://secure.travis-ci.org/node-modules/cutter.png)
 ======
 
 A cutter for head-body buffer.
 Many network protocol will use packets composed of a fixed length "head" and a variable length "body", the "data" event emitted by node socket probably not a complete packet, but part of several packets. So this `cutter` will help to get packets.
 
-## Usage   
+## Usage
 
 ```js
 var Cutter = require('cutter');
@@ -23,21 +23,19 @@ var server = net.createServer(function(socket) {
     var head = packet.slice(0, 4);
     var body = packet.slice(4, packet.length);
   });
-  socket.on('data',function(data) {
-    cutter.emit('data', data);
+  socket.on('data', function(data) {
+    cutter.handleData(data);
   });
 });
 
 server.listen(12345);
 ```
 
-## Install    
- * Clone from github   
- * Use `npm`   
+## Installation
 
- ```
- npm install cutter
- ```
+```
+$ npm install cutter --save
+```
 
- ## License   
- MIT
+## License
+The MIT license

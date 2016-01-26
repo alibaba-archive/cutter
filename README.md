@@ -26,10 +26,18 @@ var server = net.createServer(function(socket) {
   socket.on('data', function(data) {
     cutter.handleData(data);
   });
+
+  cutter.on('error', function(err) {
+    console.log(err.stack);
+  });
 });
 
 server.listen(12345);
 ```
+
+### Error Event
+
+__When cutter parse packet error, it will emit an error event.__
 
 ## Installation
 
